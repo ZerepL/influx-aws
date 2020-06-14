@@ -1,0 +1,20 @@
+---
+  - name: Configure nginx
+    hosts: all
+    become: true
+    vars_files:
+      - 'ip.yaml'
+    tasks:
+      - name: Send conf file
+        copy:
+          src: ../files/nginx_conf.sh
+          dest: /tmp/nginx_conf.sh
+          owner: root
+          group: root
+          mode: u=rwx,g=rx,o=rx
+      - name: Run the script to create Nginx config files
+        shell: /tmp/nginx_conf.sh {{ ip }}
+      - name: Load configs
+        systemd:
+          state: restarted
+          name: nginx

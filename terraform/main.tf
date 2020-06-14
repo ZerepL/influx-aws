@@ -109,6 +109,10 @@ resource "aws_instance" "influx_server" {
   }
 
   provisioner "local-exec" {
+    command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/grafana.yaml" 
+  }
+
+  provisioner "local-exec" {
     command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/nginx.yaml" 
   }
 
