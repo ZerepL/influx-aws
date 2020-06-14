@@ -13,10 +13,22 @@ variable "PROVIDER" {
     Name       = "Influx-server"
     profile    = "influx-aws"
     aws_region = "us-east-1"
-    path       = "/home/lbperez/.aws/credentials"
+    path       = "$HOME/.aws/credentials"
   }
 }
 
-variable "SECURITY_GROUP" {
-  default = ["sg-002bd7d024ba41c71"]
+variable "VPC" {
+  default = "vpc-57c9fa2d"
+}
+
+variable "SUBNET"{
+  default = "subnet-6d62850b"
+}
+
+variable "AMI" {
+  default = "ami-0affd4508a5d2481b"
+}
+
+variable "KEY_PAIR_NAME" {
+  default = "influx_key"
 }

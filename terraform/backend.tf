@@ -1,9 +1,9 @@
 terraform {
-    required_version = ">= 0.12"
+    required_version = ">= 0.12.24"
 
     backend "s3" {
         bucket  = "terraform-tf-states"
-        key     = "tfstates/influx-automation/influx-server.tfstate"
+        key     = "tfstates/influx-automation/influx-server-test.tfstate"
         region  = "us-east-1"
         profile = "influx-aws"
     }

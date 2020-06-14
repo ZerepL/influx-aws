@@ -1,0 +1,2 @@
+[influx-server]
+influx_server ansible_host=54.236.57.221
