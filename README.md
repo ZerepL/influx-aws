@@ -83,10 +83,10 @@ In order to receive metrics of other hosts, you will need to [install the agent]
 
 #### Tips
 
-If you want to collect metrics of others hosts, remember to change urls too!
+If you want to collect metrics of others hosts, remember to change URLs in `[[outputs.influxdb]]` too!
 
 ### Accessing
 
-After the end of terraform you will receive an IP, use it to access your Grafana. Your use will be `admin` and password is the one defined in `secrets.yaml` for `grafana-admin`
+After the end of terraform you will receive an IP, use it to access your Grafana. Your grafana user will be `admin` and password is the one defined in `secrets.yaml` as `grafana-admin`
 
 ![Output](./miscs/output.png)
