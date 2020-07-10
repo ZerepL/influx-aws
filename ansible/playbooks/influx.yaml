@@ -1,0 +1,60 @@
+---
+  - name: Manage InfluxDB
+    hosts: all
+    become: true
+    vars_files:
+      - 'secrets.yaml'
+    tasks:
+      - name: Make sure InfluxDB is running
+        systemd:
+          state: started
+          name: influxd
+      - name: Create databases in InfluxDB
+        uri:
+          url: "http://localhost:8086/query"
+          method: POST
+          body: "q=CREATE DATABASE {{ item }} WITH DURATION 365d"
+        loop:
+          - dados_pc
+      - name: Create admin users in InfluxDB
+        uri:
+          url: "http://localhost:8086/query"
+          method: POST
+          body: "q=CREATE USER {{ item }} WITH PASSWORD '{{ users[item] }}' WITH ALL PRIVILEGES"
+        loop:
+          - admin_influx
+      - name: Create non-admin users in InfluxDB
+        uri:
+          url: "http://localhost:8086/query"
+          method: POST
+          body: "q=CREATE USER {{ item }} WITH PASSWORD '{{ users[item] }}'"
+        loop:
+          - grafana
+          - telegraf
+      - name: Grant Read-Only to users in InfluxDB
+        uri:
+          url: "http://localhost:8086/query"
+          method: POST
+          body: 'q=GRANT READ ON "dados_pc" TO "{{ item }}"'
+        loop:
+          - grafana
+      - name: Grant Write-Only to users in InfluxDB
+        uri:
+          url: "http://localhost:8086/query"
+          method: POST
+          body: 'q=GRANT WRITE ON "dados_pc" TO "{{ item }}"'
+        loop:
+          - telegraf
+      - name: Apply InfluxDB confs
+        copy:
+          src: ../files/influxdb.conf
+          dest: /etc/influxdb/influxdb.conf
+          owner: root
+          group: root
+          mode: '777'
+      - name: Load configs
+        systemd:
+          state: restarted
+          name: influxd
+      
+  

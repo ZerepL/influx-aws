@@ -1,2 +1,4 @@
 terraform/.terraform
 terraform/*.pem
+terraform/hosts
+ansible/playbooks/ip.yaml

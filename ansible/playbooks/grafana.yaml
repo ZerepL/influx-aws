@@ -1,0 +1,58 @@
+---
+- name: Manage grafana
+  hosts: all
+  become: true
+  vars_files:
+    - 'secrets.yaml'
+    - 'ip.yaml'
+  tasks:
+    - name: Creates dashboards folder for proviser
+      file:
+        path: /var/lib/grafana/dashboards
+        state: directory
+    - name: Copy Dashboard of Linux hosts
+      copy:
+        src: ../files/linux_host_overview.json
+        dest: /var/lib/grafana/dashboards/linux_host_overview.json
+        owner: root
+        group: root
+        mode: '777'
+    - name: Copy Dashboard of Windows hosts
+      copy:
+        src: ../files/windows_host_overview.json
+        dest: /var/lib/grafana/dashboards/windows_host_overview.json
+        owner: root
+        group: root
+        mode: '777'
+    - name: Copy grafana provising for dashboards import
+      copy:
+        src: ../files/grafana_provising.yaml
+        dest: /etc/grafana/provisioning/dashboards/grafana_provising.yaml
+        owner: root
+        group: root
+        mode: '777'
+    - name: Set provising path in grafana.ini
+      lineinfile:
+        path: /etc/grafana/grafana.ini
+        regexp: 'provisioning = conf/provisioning'
+        line: provisioning = /etc/grafana/provisioning
+    - name: Make sure grafana is running
+      systemd:
+        state: restarted
+        name: grafana-server
+    - name: Change admin pass
+      shell: /usr/sbin/grafana-cli {{ users["grafana-user"] }} reset-admin-password {{ users["grafana-admin"] }}
+    - name: Create influxdb datasource
+      grafana_datasource:
+        name: "InfluxDB"
+        grafana_url: "http://0.0.0.0:3000"
+        grafana_user: '{{ users["grafana-user"] }}'
+        grafana_password: '{{ users["grafana-admin"] }}'
+        org_id: "1"
+        ds_type: "influxdb"
+        ds_url: "http://0.0.0.0:8086"
+        database: "dados_pc"
+        time_interval: ">10s"
+        user: 'grafana'
+        basic_auth_password: '{{ users["grafana"] }}'
+        basic_auth_user: 'grafana'
