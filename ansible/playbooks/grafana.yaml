@@ -41,12 +41,12 @@
         state: restarted
         name: grafana-server
     - name: Change admin pass
-      shell: /usr/sbin/grafana-cli admin reset-admin-password {{ users["grafana-admin"] }}
+      shell: /usr/sbin/grafana-cli {{ users["grafana-user"] }} reset-admin-password {{ users["grafana-admin"] }}
     - name: Create influxdb datasource
       grafana_datasource:
         name: "InfluxDB"
         grafana_url: "http://0.0.0.0:3000"
-        grafana_user: 'admin'
+        grafana_user: '{{ users["grafana-user"] }}'
         grafana_password: '{{ users["grafana-admin"] }}'
         org_id: "1"
         ds_type: "influxdb"

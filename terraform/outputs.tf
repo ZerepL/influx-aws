@@ -1,5 +1,5 @@
 
 output "IP" {
   value       = aws_instance.influx_server.public_ip
-  description = "The private ip of intance"
+  description = "The public ip of intance"
 }

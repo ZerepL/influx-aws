@@ -76,45 +76,43 @@ resource "aws_instance" "influx_server" {
   tags            = merge(var.TAGS)
 
   connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      agent       = "false"
-      private_key = tls_private_key.influx_tls.private_key_pem
-      host        = aws_instance.influx_server.public_ip
+    type        = "ssh"
+    user        = "ubuntu"
+    agent       = "false"
+    private_key = tls_private_key.influx_tls.private_key_pem
+    host        = aws_instance.influx_server.public_ip
   }
 
   provisioner "local-exec" {
-      inline = [
-          "cat > ../ansible/playbooks/ip.yaml <<EOF",
-          "---",
-          " ip: ${aws_instance.influx_server.private_ip}",
-          "EOF"
-      ]
+    command = "echo '---\n    ip: ${aws_instance.influx_server.private_ip}' > ../ansible/playbooks/ip.yaml"
   }
 
   provisioner "local-exec" {
-      inline = [
-          "cat > hosts <<EOF",
-          "[influx-server]",
-          "influx_server ansible_host=${aws_instance.influx_server.private_ip}" 
-      ]
+    command = "echo ${aws_instance.influx_server.public_ip} > hosts"
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/packages.yaml" 
+    command = "ssh-add ${var.KEY_PAIR_NAME}.pem"
+  }
+
+  provisioner "remote-exec" {
+    script = "scripts/wait_boot.sh"
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/influx.yaml" 
+    command = "ansible-playbook ../ansible/playbooks/packages.yaml" 
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/grafana.yaml" 
+    command = "ansible-playbook ../ansible/playbooks/influx.yaml" 
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -u ubuntu --private-key -i hosts ${aws_key_pair.influx_key.key_name} ../ansible/playbooks/nginx.yaml" 
+    command = "ansible-playbook ../ansible/playbooks/grafana.yaml" 
   }
 
+  provisioner "local-exec" {
+    command = "ansible-playbook ../ansible/playbooks/nginx.yaml" 
+  }
 
 }

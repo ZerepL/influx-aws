@@ -22,7 +22,7 @@
           method: POST
           body: "q=CREATE USER {{ item }} WITH PASSWORD '{{ users[item] }}' WITH ALL PRIVILEGES"
         loop:
-          - lbperez
+          - admin_influx
       - name: Create non-admin users in InfluxDB
         uri:
           url: "http://localhost:8086/query"
@@ -38,7 +38,7 @@
           body: 'q=GRANT READ ON "dados_pc" TO "{{ item }}"'
         loop:
           - grafana
-      - name: Grant Read-Only to users in InfluxDB
+      - name: Grant Write-Only to users in InfluxDB
         uri:
           url: "http://localhost:8086/query"
           method: POST
