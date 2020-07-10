@@ -115,4 +115,8 @@ resource "aws_instance" "influx_server" {
     command = "ansible-playbook ../ansible/playbooks/nginx.yaml" 
   }
 
+  provisioner "local-exec" {
+    command = "ansible-playbook ../ansible/playbooks/duck.yaml" 
+  }
+
 }

@@ -17,14 +17,14 @@ variable "PROVIDER" {
   }
 }
 
-variable "KEY_PAIR_NAME" {
-  default = "influx_key"
-}
-
 variable "VPC" {
-  default = ""
+  default = "vpc-57c9fa2d"
 }
 
 variable "SUBNET"{
-  default = ""
+  default = "subnet-6d62850b"
+}
+
+variable "KEY_PAIR_NAME" {
+  default = "influx_key"
 }

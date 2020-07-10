@@ -1,0 +1,24 @@
+---
+  - name: Manage DuckDns
+    hosts: all
+    become: true
+    vars_files:
+      - 'secrets.yaml'
+    tasks:
+      - name: Creates DuckDNS folder
+        file:
+          path: /home/ubuntu/duckdns
+          state: directory
+      - name: Send conf file
+        copy:
+          src: ../files/duck.sh
+          dest: /tmp/duck.sh
+          owner: root
+          group: root
+          mode: u=rwx,g=rx,o=rx
+      - name: Run the script to create DuckDNS config files
+        shell: /tmp/duck.sh {{ duckdns["duck_domain"] }} {{ duckdns["duck_token"] }}
+      - name: Restart Cron
+        systemd:
+          state: restarted
+          name: cron
